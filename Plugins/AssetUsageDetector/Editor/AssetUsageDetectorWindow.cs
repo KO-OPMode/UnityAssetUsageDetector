@@ -508,7 +508,7 @@ namespace AssetUsageDetectorNamespace
 				hideRedundantPrefabReferencesInAssets = WordWrappingToggleLeft( hideRedundantPrefabReferencesInAssetsLabel, hideRedundantPrefabReferencesInAssets );
 				hideRedundantPrefabReferencesInScenes = WordWrappingToggleLeft( hideRedundantPrefabReferencesInScenesLabel, hideRedundantPrefabReferencesInScenes );
 				noAssetDatabaseChanges = WordWrappingToggleLeft( "I haven't modified any assets/scenes since the last search (faster search)", noAssetDatabaseChanges );
-				showDetailedProgressBar = WordWrappingToggleLeft( "Update search progress bar more often (cancelable search) (slower search)", showDetailedProgressBar );
+				showDetailedProgressBar = WordWrappingToggleLeft( "Update search progress bar more often (slower but cancelable search)", showDetailedProgressBar );
 
 				GUILayout.Space( 10f );
 
