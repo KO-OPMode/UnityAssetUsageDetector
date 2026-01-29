@@ -404,9 +404,6 @@ namespace AssetUsageDetectorNamespace
 
 					foreach( string path in assetPaths )
 					{
-						if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) searchProgress / searchTotalProgress ) )
-							throw new Exception( "Search aborted" );
-
 						if( excludedAssetsPathsSet.Contains( path ) )
 							continue;
 
@@ -419,6 +416,9 @@ namespace AssetUsageDetectorNamespace
 							Object[] assets = AssetDatabase.LoadAllAssetsAtPath( path );
 							if( assets == null || assets.Length == 0 )
 								continue;
+
+							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) searchProgress / searchTotalProgress ) )
+								throw new Exception( "Search aborted" );
 
 							for( int i = 0; i < assets.Length; i++ )
 							{
