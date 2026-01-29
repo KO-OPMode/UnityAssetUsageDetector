@@ -196,7 +196,9 @@ namespace AssetUsageDetectorNamespace
 
 		// Quickly initiate search for the selected assets
 		[MenuItem( "GameObject/Search for References/This Object Only", priority = 49 )]
+		// ys custom start -- adjust priority to group with other search tools
 		[MenuItem( "Assets/Search for References", priority = 1000 )]
+		// ys custom end
 		private static void SearchSelectedAssetReferences( MenuCommand command )
 		{
 			// This happens when this button is clicked via hierarchy's right click context menu
@@ -511,7 +513,10 @@ namespace AssetUsageDetectorNamespace
 				lazySceneSearch = WordWrappingToggleLeft( "Lazy scene search: scenes are searched in detail only when they are manually refreshed (faster search)", lazySceneSearch );
 #if ASSET_USAGE_ADDRESSABLES
 				EditorGUI.EndDisabledGroup();
-				addressablesSupport = WordWrappingToggleLeft( "Addressables support (Experimental) (WARNING: 'Lazy scene search' will be disabled) (slower search)", addressablesSupport );
+
+				// ys custom start -- Adjust UI label to reflect usage
+				addressablesSupport = WordWrappingToggleLeft( "Search for indirect references (Addressables, Fusion, etc.) (WARNING: 'Lazy scene search' will be disabled) (slower search)", addressablesSupport );
+                // ys custom end
 #endif
 				calculateUnusedObjects = WordWrappingToggleLeft( "Calculate unused objects", calculateUnusedObjects );
 				hideDuplicateRows = WordWrappingToggleLeft( "Hide duplicate rows in search results", hideDuplicateRows );

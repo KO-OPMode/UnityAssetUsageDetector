@@ -45,8 +45,12 @@ namespace AssetUsageDetectorNamespace
 
 			public bool lazySceneSearch = true;
 #if ASSET_USAGE_ADDRESSABLES
-			public bool addressablesSupport = false;
+            // ys custom start
+            // Default Addressables support to true
+			public bool addressablesSupport = true;
+            // ys custom end
 #endif
+
 			public bool calculateUnusedObjects = false;
 			public bool hideDuplicateRows = true;
 			public bool hideRedundantPrefabReferencesInAssets = false;
