@@ -417,7 +417,7 @@ namespace AssetUsageDetectorNamespace
 							if( assets == null || assets.Length == 0 )
 								continue;
 
-							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) searchProgress / searchTotalProgress ) )
+							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) ++searchProgress / searchTotalProgress ) )
 								throw new Exception( "Search aborted" );
 
 							for( int i = 0; i < assets.Length; i++ )
@@ -446,7 +446,7 @@ namespace AssetUsageDetectorNamespace
 
 					for( int i = 0; i < projectSettingsToSearch.Length; i++ )
 					{
-						if( searchParameters.showDetailedProgressBar && ++searchProgress % 30 == 1 && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) searchProgress / searchTotalProgress ) )
+						if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) ++searchProgress / searchTotalProgress ) )
 							throw new Exception( "Search aborted" );
 
 						Object[] assets = AssetDatabase.LoadAllAssetsAtPath( projectSettingsToSearch[i] );
