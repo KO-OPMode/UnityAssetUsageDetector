@@ -1386,11 +1386,9 @@ namespace AssetUsageDetectorNamespace
 			Object unityObject = (Object) referenceNode.nodeObject;
 			if( !isInPlayMode || unityObject.IsAsset() || forceUseSerializedObject )
 			{
-#if ASSET_USAGE_ADDRESSABLES
 				// See: https://github.com/yasirkula/UnityAssetUsageDetector/issues/29
-				if( searchParameters.addressablesSupport && unityObject.name == "Deprecated EditorExtensionImpl" )
+				if( searchParameters.indirectReferenceSupport && unityObject.name == "Deprecated EditorExtensionImpl" )
 					return;
-#endif
 
 				SerializedObject so = new SerializedObject( unityObject );
 				SerializedProperty iterator = so.GetIterator();
@@ -1441,7 +1439,7 @@ namespace AssetUsageDetectorNamespace
 								case SerializedPropertyType.Generic:
 								{
 #if ASSET_USAGE_ADDRESSABLES
-									if( searchParameters.addressablesSupport && iterator.type.StartsWithFast( "AssetReference" ) && GetRawSerializedPropertyValue( iterator ) is AssetReference assetReference )
+									if( searchParameters.indirectReferenceSupport && iterator.type.StartsWithFast( "AssetReference" ) && GetRawSerializedPropertyValue( iterator ) is AssetReference assetReference )
 									{
 										propertyValue = GetAddressablesAssetReferenceValue( assetReference );
 										searchResult = SearchObject( PreferablyGameObject( propertyValue ) );
@@ -1543,7 +1541,7 @@ namespace AssetUsageDetectorNamespace
 					if( !( variableValue is ICollection ) )
 					{
 #if ASSET_USAGE_ADDRESSABLES
-						if( searchParameters.addressablesSupport && variableValue is AssetReference )
+						if( searchParameters.indirectReferenceSupport && variableValue is AssetReference )
 						{
 							variableValue = GetAddressablesAssetReferenceValue( (AssetReference) variableValue );
 							if( variableValue == null || variableValue.Equals( null ) )

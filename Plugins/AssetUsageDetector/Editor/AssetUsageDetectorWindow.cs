@@ -20,9 +20,7 @@ namespace AssetUsageDetectorNamespace
 		private const string PREFS_DONT_SEARCH_SOURCE_ASSETS = "AUD_AssetsExcludeSrc";
 		private const string PREFS_SEARCH_UNUSED_MATERIAL_PROPERTIES = "AUD_SearchUnusedMaterialProps";
 		private const string PREFS_LAZY_SCENE_SEARCH = "AUD_LazySceneSearch";
-#if ASSET_USAGE_ADDRESSABLES
-		private const string PREFS_ADDRESSABLES_SUPPORT = "AUD_AddressablesSupport";
-#endif
+		private const string PREFS_ADDRESSABLES_SUPPORT = "AUD_IndirectReferenceSupport";
 		private const string PREFS_CALCULATE_UNUSED_OBJECTS = "AUD_FindUnusedObjs";
 		private const string PREFS_HIDE_DUPLICATE_ROWS = "AUD_HideDuplicates";
 		private const string PREFS_HIDE_REDUNDANT_PREFAB_REFERENCES_IN_ASSETS = "AUD_HideRedundantPRefsInAssets";
@@ -83,9 +81,7 @@ namespace AssetUsageDetectorNamespace
 		private List<Object> excludedScenes = new List<Object>() { null }; // These scenes won't be searched for references
 
 		private bool lazySceneSearch = true;
-#if ASSET_USAGE_ADDRESSABLES
-		private bool addressablesSupport = false;
-#endif
+		private bool indirectReferenceSupport = false;
 		private bool searchUnusedMaterialProperties = true;
 		private bool calculateUnusedObjects = false;
 		private bool hideDuplicateRows = true;
@@ -289,9 +285,7 @@ namespace AssetUsageDetectorNamespace
 				searchUnusedMaterialProperties = searchParameters.searchUnusedMaterialProperties;
 				searchRefactoring = searchParameters.searchRefactoring;
 				lazySceneSearch = searchParameters.lazySceneSearch;
-#if ASSET_USAGE_ADDRESSABLES
-				addressablesSupport = searchParameters.addressablesSupport;
-#endif
+				indirectReferenceSupport = searchParameters.indirectReferenceSupport;
 				calculateUnusedObjects = searchParameters.calculateUnusedObjects;
 				hideDuplicateRows = searchParameters.hideDuplicateRows;
 				hideRedundantPrefabReferencesInAssets = searchParameters.hideRedundantPrefabReferencesInAssets;
@@ -364,9 +358,7 @@ namespace AssetUsageDetectorNamespace
 			EditorPrefs.SetBool( PREFS_SEARCH_PROJECT_SETTINGS, searchInProjectSettings );
 			EditorPrefs.SetBool( PREFS_SEARCH_UNUSED_MATERIAL_PROPERTIES, searchUnusedMaterialProperties );
 			EditorPrefs.SetBool( PREFS_LAZY_SCENE_SEARCH, lazySceneSearch );
-#if ASSET_USAGE_ADDRESSABLES
-			EditorPrefs.SetBool( PREFS_ADDRESSABLES_SUPPORT, addressablesSupport );
-#endif
+			EditorPrefs.SetBool( PREFS_ADDRESSABLES_SUPPORT, indirectReferenceSupport );
 			EditorPrefs.SetBool( PREFS_CALCULATE_UNUSED_OBJECTS, calculateUnusedObjects );
 			EditorPrefs.SetBool( PREFS_HIDE_DUPLICATE_ROWS, hideDuplicateRows );
 			EditorPrefs.SetBool( PREFS_HIDE_REDUNDANT_PREFAB_REFERENCES_IN_ASSETS, hideRedundantPrefabReferencesInAssets );
@@ -383,9 +375,7 @@ namespace AssetUsageDetectorNamespace
 			searchInProjectSettings = EditorPrefs.GetBool( PREFS_SEARCH_PROJECT_SETTINGS, true );
 			searchUnusedMaterialProperties = EditorPrefs.GetBool( PREFS_SEARCH_UNUSED_MATERIAL_PROPERTIES, true );
 			lazySceneSearch = EditorPrefs.GetBool( PREFS_LAZY_SCENE_SEARCH, true );
-#if ASSET_USAGE_ADDRESSABLES
-			addressablesSupport = EditorPrefs.GetBool( PREFS_ADDRESSABLES_SUPPORT, false );
-#endif
+			indirectReferenceSupport = EditorPrefs.GetBool( PREFS_ADDRESSABLES_SUPPORT, false );
 			calculateUnusedObjects = EditorPrefs.GetBool( PREFS_CALCULATE_UNUSED_OBJECTS, false );
 			hideDuplicateRows = EditorPrefs.GetBool( PREFS_HIDE_DUPLICATE_ROWS, true );
 			hideRedundantPrefabReferencesInAssets = EditorPrefs.GetBool( PREFS_HIDE_REDUNDANT_PREFAB_REFERENCES_IN_ASSETS, hideRedundantPrefabReferencesInAssets );
@@ -507,17 +497,12 @@ namespace AssetUsageDetectorNamespace
 
 				Utilities.DrawHeader( "<b>SETTINGS</b>" );
 
-#if ASSET_USAGE_ADDRESSABLES
-				EditorGUI.BeginDisabledGroup( addressablesSupport );
-#endif
+				EditorGUI.BeginDisabledGroup( indirectReferenceSupport );
 				lazySceneSearch = WordWrappingToggleLeft( "Lazy scene search: scenes are searched in detail only when they are manually refreshed (faster search)", lazySceneSearch );
-#if ASSET_USAGE_ADDRESSABLES
 				EditorGUI.EndDisabledGroup();
 
-				// ys custom start -- Adjust UI label to reflect usage
-				addressablesSupport = WordWrappingToggleLeft( "Search for indirect references (Addressables, Fusion, etc.) (WARNING: 'Lazy scene search' will be disabled) (slower search)", addressablesSupport );
-                // ys custom end
-#endif
+				indirectReferenceSupport = WordWrappingToggleLeft( "Search for indirect references (Addressables, Fusion, etc.) (WARNING: 'Lazy scene search' will be disabled) (slower search)", indirectReferenceSupport );
+				
 				calculateUnusedObjects = WordWrappingToggleLeft( "Calculate unused objects", calculateUnusedObjects );
 				hideDuplicateRows = WordWrappingToggleLeft( "Hide duplicate rows in search results", hideDuplicateRows );
 				hideRedundantPrefabReferencesInAssets = WordWrappingToggleLeft( hideRedundantPrefabReferencesInAssetsLabel, hideRedundantPrefabReferencesInAssets );
@@ -667,12 +652,8 @@ namespace AssetUsageDetectorNamespace
 				searchInProjectSettings = searchInProjectSettings,
 				searchUnusedMaterialProperties = searchUnusedMaterialProperties,
 				searchRefactoring = searchRefactoring,
-#if ASSET_USAGE_ADDRESSABLES
-				lazySceneSearch = lazySceneSearch && !addressablesSupport,
-				addressablesSupport = addressablesSupport,
-#else
-				lazySceneSearch = lazySceneSearch,
-#endif
+				lazySceneSearch = lazySceneSearch && !indirectReferenceSupport,
+				indirectReferenceSupport = indirectReferenceSupport,
 				calculateUnusedObjects = calculateUnusedObjects,
 				hideDuplicateRows = hideDuplicateRows,
 				hideRedundantPrefabReferencesInAssets = hideRedundantPrefabReferencesInAssets,
