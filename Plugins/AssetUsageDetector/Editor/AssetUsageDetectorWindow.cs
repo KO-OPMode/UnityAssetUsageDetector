@@ -20,7 +20,8 @@ namespace AssetUsageDetectorNamespace
 		private const string PREFS_DONT_SEARCH_SOURCE_ASSETS = "AUD_AssetsExcludeSrc";
 		private const string PREFS_SEARCH_UNUSED_MATERIAL_PROPERTIES = "AUD_SearchUnusedMaterialProps";
 		private const string PREFS_LAZY_SCENE_SEARCH = "AUD_LazySceneSearch";
-		private const string PREFS_ADDRESSABLES_SUPPORT = "AUD_IndirectReferenceSupport";
+		private const string PREFS_INDIRECT_REFERENCE_SUPPORT = "AUD_IndirectReferenceSupport";
+        private const string PREFS_NON_SERIALIZED_REFERENCE_SUPPORT = "AUD_NonSerializedReferenceSupport";
 		private const string PREFS_CALCULATE_UNUSED_OBJECTS = "AUD_FindUnusedObjs";
 		private const string PREFS_HIDE_DUPLICATE_ROWS = "AUD_HideDuplicates";
 		private const string PREFS_HIDE_REDUNDANT_PREFAB_REFERENCES_IN_ASSETS = "AUD_HideRedundantPRefsInAssets";
@@ -82,6 +83,7 @@ namespace AssetUsageDetectorNamespace
 
 		private bool lazySceneSearch = true;
 		private bool indirectReferenceSupport = false;
+        private bool nonSerializedReferenceSupport = false;
 		private bool searchUnusedMaterialProperties = true;
 		private bool calculateUnusedObjects = false;
 		private bool hideDuplicateRows = true;
@@ -286,6 +288,8 @@ namespace AssetUsageDetectorNamespace
 				searchRefactoring = searchParameters.searchRefactoring;
 				lazySceneSearch = searchParameters.lazySceneSearch;
 				indirectReferenceSupport = searchParameters.indirectReferenceSupport;
+                nonSerializedReferenceSupport = searchParameters.nonSerializedReferenceSupport;
+                
 				calculateUnusedObjects = searchParameters.calculateUnusedObjects;
 				hideDuplicateRows = searchParameters.hideDuplicateRows;
 				hideRedundantPrefabReferencesInAssets = searchParameters.hideRedundantPrefabReferencesInAssets;
@@ -358,7 +362,8 @@ namespace AssetUsageDetectorNamespace
 			EditorPrefs.SetBool( PREFS_SEARCH_PROJECT_SETTINGS, searchInProjectSettings );
 			EditorPrefs.SetBool( PREFS_SEARCH_UNUSED_MATERIAL_PROPERTIES, searchUnusedMaterialProperties );
 			EditorPrefs.SetBool( PREFS_LAZY_SCENE_SEARCH, lazySceneSearch );
-			EditorPrefs.SetBool( PREFS_ADDRESSABLES_SUPPORT, indirectReferenceSupport );
+			EditorPrefs.SetBool( PREFS_INDIRECT_REFERENCE_SUPPORT, indirectReferenceSupport );
+            EditorPrefs.SetBool( PREFS_NON_SERIALIZED_REFERENCE_SUPPORT, nonSerializedReferenceSupport);
 			EditorPrefs.SetBool( PREFS_CALCULATE_UNUSED_OBJECTS, calculateUnusedObjects );
 			EditorPrefs.SetBool( PREFS_HIDE_DUPLICATE_ROWS, hideDuplicateRows );
 			EditorPrefs.SetBool( PREFS_HIDE_REDUNDANT_PREFAB_REFERENCES_IN_ASSETS, hideRedundantPrefabReferencesInAssets );
@@ -375,7 +380,8 @@ namespace AssetUsageDetectorNamespace
 			searchInProjectSettings = EditorPrefs.GetBool( PREFS_SEARCH_PROJECT_SETTINGS, true );
 			searchUnusedMaterialProperties = EditorPrefs.GetBool( PREFS_SEARCH_UNUSED_MATERIAL_PROPERTIES, true );
 			lazySceneSearch = EditorPrefs.GetBool( PREFS_LAZY_SCENE_SEARCH, true );
-			indirectReferenceSupport = EditorPrefs.GetBool( PREFS_ADDRESSABLES_SUPPORT, false );
+			indirectReferenceSupport = EditorPrefs.GetBool( PREFS_INDIRECT_REFERENCE_SUPPORT, false );
+            nonSerializedReferenceSupport = EditorPrefs.GetBool( PREFS_NON_SERIALIZED_REFERENCE_SUPPORT, false );
 			calculateUnusedObjects = EditorPrefs.GetBool( PREFS_CALCULATE_UNUSED_OBJECTS, false );
 			hideDuplicateRows = EditorPrefs.GetBool( PREFS_HIDE_DUPLICATE_ROWS, true );
 			hideRedundantPrefabReferencesInAssets = EditorPrefs.GetBool( PREFS_HIDE_REDUNDANT_PREFAB_REFERENCES_IN_ASSETS, hideRedundantPrefabReferencesInAssets );
@@ -502,6 +508,7 @@ namespace AssetUsageDetectorNamespace
 				EditorGUI.EndDisabledGroup();
 
 				indirectReferenceSupport = WordWrappingToggleLeft( "Search for indirect references (Addressables, Fusion, etc.) (WARNING: 'Lazy scene search' will be disabled) (slower search)", indirectReferenceSupport );
+                nonSerializedReferenceSupport = WordWrappingToggleLeft( "Search for non-serialized references (properties, private fields, etc) (much slower search)", nonSerializedReferenceSupport );
 				
 				calculateUnusedObjects = WordWrappingToggleLeft( "Calculate unused objects", calculateUnusedObjects );
 				hideDuplicateRows = WordWrappingToggleLeft( "Hide duplicate rows in search results", hideDuplicateRows );
@@ -654,6 +661,7 @@ namespace AssetUsageDetectorNamespace
 				searchRefactoring = searchRefactoring,
 				lazySceneSearch = lazySceneSearch && !indirectReferenceSupport,
 				indirectReferenceSupport = indirectReferenceSupport,
+                nonSerializedReferenceSupport = nonSerializedReferenceSupport,
 				calculateUnusedObjects = calculateUnusedObjects,
 				hideDuplicateRows = hideDuplicateRows,
 				hideRedundantPrefabReferencesInAssets = hideRedundantPrefabReferencesInAssets,

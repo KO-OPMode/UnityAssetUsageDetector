@@ -45,6 +45,7 @@ namespace AssetUsageDetectorNamespace
 
 			public bool lazySceneSearch = true;
 			public bool indirectReferenceSupport = true;
+            public bool nonSerializedReferenceSupport = false;
 
 			public bool calculateUnusedObjects = false;
 			public bool hideDuplicateRows = true;
@@ -417,7 +418,7 @@ namespace AssetUsageDetectorNamespace
 							if( assets == null || assets.Length == 0 )
 								continue;
 
-							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) ++searchProgress / searchTotalProgress ) )
+							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) searchProgress / searchTotalProgress ) )
 								throw new Exception( "Search aborted" );
 
 							for( int i = 0; i < assets.Length; i++ )
@@ -446,7 +447,7 @@ namespace AssetUsageDetectorNamespace
 
 					for( int i = 0; i < projectSettingsToSearch.Length; i++ )
 					{
-						if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) ++searchProgress / searchTotalProgress ) )
+						if( searchParameters.showDetailedProgressBar && ++searchProgress % 30 == 1 && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) searchProgress / searchTotalProgress ) )
 							throw new Exception( "Search aborted" );
 
 						Object[] assets = AssetDatabase.LoadAllAssetsAtPath( projectSettingsToSearch[i] );
@@ -979,6 +980,18 @@ namespace AssetUsageDetectorNamespace
 		{
 			if( obj == null || obj.Equals( null ) )
 				return null;
+
+            if (IgnoredTypes.Count > 0)
+            {
+                var objType = obj.GetType();
+                foreach (var ignoredType in IgnoredTypes)
+                {
+                    if (ignoredType.IsAssignableFrom(objType))
+                    {
+                        return null;
+                    }
+                }
+            }
 
 			// Avoid recursion (which leads to stackoverflow exception) using a stack (initially, I was using callStack.ContainsFast
 			// here but it returned false for objects that do exist in the call stack if VFX Graph window was open)
