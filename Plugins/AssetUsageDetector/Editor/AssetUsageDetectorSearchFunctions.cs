@@ -198,6 +198,29 @@ namespace AssetUsageDetectorNamespace
 		private readonly MethodInfo vfxSerializableObjectValueGetter = Array.Find( Array.Find( AppDomain.CurrentDomain.GetAssemblies(), ( assembly ) => assembly.GetName().Name == "Unity.VisualEffectGraph.Editor" ).GetType( "UnityEditor.VFX.VFXSerializableObject" ).GetMethods( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance ), ( methodInfo ) => methodInfo.Name == "Get" && !methodInfo.IsGenericMethod );
 #endif
 
+#region Custom Indirect Reference Types
+
+        private static readonly List<CustomIndirectReferenceSearchDefinition> CustomIndirectReferenceSearchDefinitions = new();
+
+        public abstract class CustomIndirectReferenceSearchDefinition
+        {
+            public abstract bool TypeNameMatches(string typeName);
+            public abstract bool ShouldSearchChildren();
+            public abstract bool TryGetValueFromIndirectReference(object reference, out Object value);
+        }
+
+        public static void RegisterCustomIndirectReferenceSearch(CustomIndirectReferenceSearchDefinition definition)
+        {
+            CustomIndirectReferenceSearchDefinitions.Add(definition);
+        }
+        
+        public static void UnregisterCustomIndirectReferenceSearch(CustomIndirectReferenceSearchDefinition definition)
+        {
+            CustomIndirectReferenceSearchDefinitions.Remove(definition);
+        }
+
+#endregion
+
 		private void InitializeSearchFunctionsData( Parameters searchParameters )
 		{
 			if( typeToSearchFunction == null )
@@ -1457,6 +1480,46 @@ namespace AssetUsageDetectorNamespace
 									}
 									else
 #endif
+									if (searchParameters.indirectReferenceSupport &&
+                                        CustomIndirectReferenceSearchDefinitions.Count > 0)
+                                    {
+                                        // Assign default values to silence compiler issues about not setting these
+                                        propertyValue = null;
+                                        searchResult = null;
+                                        enterChildren = false;
+                                        
+                                        bool handledByCustomSearchDefinition = false;
+                                        foreach (var definition in CustomIndirectReferenceSearchDefinitions)
+                                        {
+                                            try
+                                            {
+
+                                                if (definition.TypeNameMatches(iterator.type) &&
+                                                    definition.TryGetValueFromIndirectReference(
+                                                        GetRawSerializedPropertyValue(iterator), out var obj))
+                                                {
+                                                    propertyValue = obj;
+                                                    searchResult = SearchObject(PreferablyGameObject(propertyValue));
+                                                    enterChildren = definition.ShouldSearchChildren();
+                                                    handledByCustomSearchDefinition = true;
+                                                    break;
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Debug.LogException(e);
+                                            }
+                                        }
+
+                                        if (!handledByCustomSearchDefinition)
+                                        {
+                                            // If we didn't handle this value yet, keep searching deeper
+                                            propertyValue = null;
+                                            searchResult = null;
+                                            enterChildren = true;
+                                        }
+                                    }
+                                    else
 									{
 										propertyValue = null;
 										searchResult = null;
@@ -1548,6 +1611,28 @@ namespace AssetUsageDetectorNamespace
 								continue;
 						}
 #endif
+						
+                        if (searchParameters.indirectReferenceSupport && CustomIndirectReferenceSearchDefinitions.Count > 0)
+                        {
+                            foreach (var definition in CustomIndirectReferenceSearchDefinitions)
+                            {
+                                try
+                                {
+                                    if (definition.TryGetValueFromIndirectReference(variableValue, out var obj))
+                                    {
+                                        variableValue = obj;
+                                        break;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Debug.LogException(e);
+                                }
+                            }
+
+							if( variableValue == null || variableValue.Equals( null ) )
+								continue;
+                        }
 
 						ReferenceNode searchResult = SearchObject( PreferablyGameObject( variableValue ) );
 						if( searchResult != null && searchResult != referenceNode )
