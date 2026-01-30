@@ -152,6 +152,9 @@ namespace AssetUsageDetectorNamespace
 			// Make sure that the AssetDatabase is up-to-date
 			AssetDatabase.SaveAssets();
 
+            // Pre-initialize result with mostly empty values in case we have to early exit
+            SearchResult result = new SearchResult(false, null, null, initialSceneSetup, this, searchParameters);
+
 			try
 			{
 				this.searchParameters = searchParameters;
@@ -557,7 +560,7 @@ namespace AssetUsageDetectorNamespace
 				// Log some c00l stuff to console
 				Debug.Log( "Searched " + searchedObjectsCount + " objects in " + ( EditorApplication.timeSinceStartup - searchStartTime ).ToString( "F2" ) + " seconds" );
 
-				return new SearchResult( true, searchResult, usedObjects, initialSceneSetup, this, searchParameters );
+				result = new SearchResult( true, searchResult, usedObjects, initialSceneSetup, this, searchParameters );
 			}
 			catch( Exception e )
 			{
@@ -586,7 +589,7 @@ namespace AssetUsageDetectorNamespace
 				catch
 				{ }
 
-				return new SearchResult( false, searchResult, null, initialSceneSetup, this, searchParameters );
+				result = new SearchResult( false, searchResult, null, initialSceneSetup, this, searchParameters );
 			}
 			finally
 			{
@@ -594,6 +597,11 @@ namespace AssetUsageDetectorNamespace
 				currentSearchedObject = null;
 
 				EditorUtility.ClearProgressBar();
+
+                if ( !searchParameters.keepScenesWithReferencesOpen )
+                {
+                    result.RestoreInitialSceneSetup(displayDialog: false);
+                }
 
 				// If the active scene was changed during search, reset it
 				if( EditorSceneManager.GetActiveScene() != activeScene )
@@ -622,7 +630,9 @@ namespace AssetUsageDetectorNamespace
 						AssetDatabase.OpenAsset( AssetDatabase.LoadAssetAtPath<GameObject>( openPrefabStageAssetPath ) );
 				}
 			}
-		}
+            
+            return result;
+        }
 
 		private void InitializeSearchResultNodes( List<SearchResultGroup> searchResult )
 		{
@@ -932,7 +942,7 @@ namespace AssetUsageDetectorNamespace
 			}
 
 			// If no references are found in the scene and if the scene is not part of the initial scene setup, close it
-			if( !searchParameters.keepScenesWithReferencesOpen || currentSearchResultGroup.NumberOfReferences == 0 )
+			if( currentSearchResultGroup.NumberOfReferences == 0 )
 			{
 				if( !isInPlayMode )
 				{

@@ -435,7 +435,7 @@ namespace AssetUsageDetectorNamespace
 
 		// Close the scenes that were not part of the initial scene setup
 		// Returns true if initial scene setup is restored successfully
-		public bool RestoreInitialSceneSetup()
+		public bool RestoreInitialSceneSetup(bool displayDialog = true)
 		{
 			if( initialSceneSetup == null || initialSceneSetup.Length == 0 )
 				return true;
@@ -453,16 +453,20 @@ namespace AssetUsageDetectorNamespace
 			for( int i = 0; i < initialSceneSetup.Length; i++ )
 				sb.AppendLine().Append( "- " ).Append( initialSceneSetup[i].path );
 
-			switch( EditorUtility.DisplayDialogComplex( "Asset Usage Detector", sb.ToString(), "Yes", "Cancel", "Leave it as is" ) )
-			{
-				case 1: return false;
-				case 2: return true;
-			}
+            if (displayDialog)
+            {
+                switch (EditorUtility.DisplayDialogComplex("Asset Usage Detector", sb.ToString(), "Yes", "Cancel",
+                            "Leave it as is"))
+                {
+                    case 1: return false;
+                    case 2: return true;
+                }
 
-			if( !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo() )
-				return false;
+                if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                    return false;
+            }
 
-			for( int i = 0; i < initialSceneSetup.Length; i++ )
+            for( int i = 0; i < initialSceneSetup.Length; i++ )
 			{
 				Scene scene = EditorSceneManager.GetSceneByPath( initialSceneSetup[i].path );
 				if( !scene.isLoaded )

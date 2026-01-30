@@ -363,6 +363,16 @@ namespace AssetUsageDetectorNamespace
 		internal PrefabMatch( Object source, Object value ) : base( source, value ) { }
 	}
 
+    /// <summary>
+    /// - Source: GameObject Instance
+    /// - Value: Prefab of that GameObject
+    /// </summary>
+    public class IndirectReferenceMatch : ReadOnlySearchMatch
+    {
+        internal IndirectReferenceMatch( Object source, Object value ) : base( source, value ) { }
+    }
+
+    
 	/// <summary>
 	/// - Source: Object that references Value
 	/// - Value: Matched object
