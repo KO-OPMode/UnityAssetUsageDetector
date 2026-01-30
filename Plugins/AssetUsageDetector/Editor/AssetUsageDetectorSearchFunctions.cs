@@ -1514,8 +1514,26 @@ namespace AssetUsageDetectorNamespace
                                                         GetRawSerializedPropertyValue(iterator), out var obj))
                                                 {
                                                     propertyValue = obj;
-                                                    searchResult = SearchObject(PreferablyGameObject(propertyValue));
+
+                                                    if (objectsToSearchSet.Contains(propertyValue)) 
+                                                    {
+                                                        // We found an object we're searching for via an indirect reference
+                                                        referenceNode.AddLinkTo( GetReferenceNode( propertyValue ) );
+                                                        
+                                                        if( searchParameters.searchRefactoring != null )
+                                                            searchParameters.searchRefactoring( new IndirectReferenceMatch( unityObject, propertyValue ) );
+                                                    }
+                                                    else
+                                                    {
+                                                        // We didn't find an object we're searching for, but maybe we'll
+                                                        // find something linked through the indirect reference
+                                                        // (Possibly this should get removed, since an indirect reference isn't
+                                                        // _really_ a reference tying these two obejcts together)
+                                                        searchResult = SearchObject(PreferablyGameObject(propertyValue));
+                                                    }
+                                                    
                                                     enterChildren = definition.ShouldSearchChildren();
+
                                                     handledByCustomSearchDefinition = true;
                                                     break;
                                                 }

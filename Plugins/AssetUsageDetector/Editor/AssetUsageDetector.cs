@@ -30,6 +30,7 @@ namespace AssetUsageDetectorNamespace
 			public SceneSearchMode searchInScenes = SceneSearchMode.AllScenes;
 			public Object[] searchInScenesSubset = null;
 			public Object[] excludedScenesFromSearch = null;
+            public bool keepScenesWithReferencesOpen = false;
 			public bool searchInSceneLightingSettings = true;
 			public bool searchInAssetsFolder = true;
 			public Object[] searchInAssetsSubset = null;
@@ -856,8 +857,13 @@ namespace AssetUsageDetectorNamespace
 			{
 				if( obj is GameObject )
 					sceneObjectsToSearchScenesSet.Add( ( (GameObject) obj ).scene.path );
-				else if( obj is Component )
-					sceneObjectsToSearchScenesSet.Add( ( (Component) obj ).gameObject.scene.path );
+				else if (obj is Component)
+                    sceneObjectsToSearchScenesSet.Add(((Component)obj).gameObject.scene.path);
+                else
+                    // This is -not- a serialized asset, but it's also not a scene object...
+                    // Most likely, it is performing some kind of custom search logic
+                    // Treat as an asset so that we can aggressively search for it
+                    assetsToSearchSet.Add(obj);
 			}
 
 			if( expandGameObjects && obj is GameObject )
@@ -926,7 +932,7 @@ namespace AssetUsageDetectorNamespace
 			}
 
 			// If no references are found in the scene and if the scene is not part of the initial scene setup, close it
-			if( currentSearchResultGroup.NumberOfReferences == 0 )
+			if( !searchParameters.keepScenesWithReferencesOpen || currentSearchResultGroup.NumberOfReferences == 0 )
 			{
 				if( !isInPlayMode )
 				{
