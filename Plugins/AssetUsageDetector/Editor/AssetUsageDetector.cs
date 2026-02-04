@@ -422,7 +422,7 @@ namespace AssetUsageDetectorNamespace
 							if( assets == null || assets.Length == 0 )
 								continue;
 
-							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) searchProgress / searchTotalProgress ) )
+							if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Searching assets...", path, (float) ++searchProgress / searchTotalProgress ) )
 								throw new Exception( "Search aborted" );
 
 							for( int i = 0; i < assets.Length; i++ )
@@ -446,12 +446,12 @@ namespace AssetUsageDetectorNamespace
 				{
 					currentSearchResultGroup = new SearchResultGroup( "Project Settings", SearchResultGroup.GroupType.ProjectSettings );
 
-					if( EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) searchProgress / searchTotalProgress ) )
+					if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) ++searchProgress / searchTotalProgress ) )
 						throw new Exception( "Search aborted" );
 
 					for( int i = 0; i < projectSettingsToSearch.Length; i++ )
 					{
-						if( searchParameters.showDetailedProgressBar && ++searchProgress % 30 == 1 && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) searchProgress / searchTotalProgress ) )
+						if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching Project Settings", (float) ++searchProgress / searchTotalProgress ) )
 							throw new Exception( "Search aborted" );
 
 						Object[] assets = AssetDatabase.LoadAllAssetsAtPath( projectSettingsToSearch[i] );
@@ -497,7 +497,7 @@ namespace AssetUsageDetectorNamespace
 					// Search scenes for references
 					foreach( string scenePath in scenesToSearch )
 					{
-						if( EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching scene: " + scenePath, (float) ++searchProgress / searchTotalProgress ) )
+						if( searchParameters.showDetailedProgressBar && EditorUtility.DisplayCancelableProgressBar( "Please wait...", "Searching scene: " + scenePath, (float) ++searchProgress / searchTotalProgress ) )
 							throw new Exception( "Search aborted" );
 
 						if( string.IsNullOrEmpty( scenePath ) )
@@ -871,7 +871,8 @@ namespace AssetUsageDetectorNamespace
                     sceneObjectsToSearchScenesSet.Add(((Component)obj).gameObject.scene.path);
                 else
                     // This is -not- a serialized asset, but it's also not a scene object...
-                    // Most likely, it is performing some kind of custom search logic
+                    // Most likely, it is the result of custom search logic such as a temporary
+					// object returned from a custom indirect search
                     // Treat as an asset so that we can aggressively search for it
                     assetsToSearchSet.Add(obj);
 			}
