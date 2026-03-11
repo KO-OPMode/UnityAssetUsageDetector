@@ -197,7 +197,7 @@ namespace AssetUsageDetectorNamespace
 		// Quickly initiate search for the selected assets
 		[MenuItem( "GameObject/Search for References/This Object Only", priority = 49 )]
 		// ys custom start -- adjust priority to group with other search tools
-		[MenuItem( "Assets/Search for References", priority = 1000 )]
+		[MenuItem( "Assets/Search for References", priority = 99 )]
 		// ys custom end
 		private static void SearchSelectedAssetReferences( MenuCommand command )
 		{
